@@ -62,10 +62,12 @@ function getContractData() {
     dataSheet.getRange(startRowNumber, 1, endRowNumber, endColumnNumber).setValues(finishedCData);
     dataSheet.getRange(startRowNumber,8,endRowNumber,endColumnNumber).setNumberFormat("@");
 
+    // Send a pop-up saying how many new contracts were sold/added to the spreadsheet
     SpreadsheetApp.getUi().alert("added " + finishedCData.length + " contracts")
   }
 }
 
+// The Data i get gives me a timestamp format that google doesn't recognize. I change it in this function
 function fixTimeStamp(timestamp){
 
   // replace 11th character with space
@@ -84,6 +86,7 @@ function replaceCharacter(index, replacement, targetString) {
   return targetString.substr(0, index) + replacement + targetString.substr(index + replacement.length);
 }
 
+// Get only the data that i want.
 function prepareFinishedContract(data, lastContractAcceptDate){
   let wrappedData = [];
   let finishedData = [];
@@ -99,13 +102,17 @@ function prepareFinishedContract(data, lastContractAcceptDate){
         if(data[i][15] != 0){
           if(fixTimeStamp(data[i][6]) > fixTimeStamp(lastContractAcceptDate) || lastContractAcceptDate == "date_accepted"){
             finishedRow[7] = fixTimeStamp(finishedRow[7])
-            finishedRow[8] = fixTimeStamp(finishedRow[8])
+            finishedRow[8] = fixTimeStamp(finishedRow[8]);
+            console.log(finishedRow[7]);
+            let aDate = new Date(finishedRow[7]);
+            finishedRow[9] = aDate.getMonth() + 1
             finishedData.push(finishedRow);
           }
         }
       }
     // This separates the Outstanding contracts from the finished contracts
     } else if(data[i][18] == 'outstanding'){
+      // Makes sure that the value of the contract isn't 0
        if(data[i][15] != 0){
           outstandingRow[4] = fixTimeStamp(outstandingRow[4])
           outstandingData.push(outstandingRow);
